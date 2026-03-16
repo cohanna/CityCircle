@@ -5,6 +5,7 @@ import androidx.navigation.compose.*
 import com.csci448.kate_lundberg.citycircle.ui.screens.LoginScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.CreateAccountScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.PreferencesScreen
+import com.csci448.kate_lundberg.citycircle.ui.screens.ProfileSetupScreen
 
 @Composable
 fun CityCircleNavGraph() {
@@ -26,6 +27,16 @@ fun CityCircleNavGraph() {
 
         composable("create_account") {
             CreateAccountScreen(
+                onNextClick = {
+                    navController.navigate("preferences")
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable("profile_setup") {
+            ProfileSetupScreen(
                 onNextClick = {
                     navController.navigate("preferences")
                 },
