@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import com.csci448.kate_lundberg.citycircle.R
 
 @Composable
-fun LoginScreen(onCreateAccountClick: () -> Unit) {
+fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -49,7 +49,7 @@ fun LoginScreen(onCreateAccountClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ElevatedButton (onClick = { },
+        ElevatedButton (onClick = onSignInClick,
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Blue,
@@ -74,5 +74,5 @@ fun LoginScreen(onCreateAccountClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onCreateAccountClick = {})
+    LoginScreen(onSignInClick = {}, onCreateAccountClick = {})
 }
