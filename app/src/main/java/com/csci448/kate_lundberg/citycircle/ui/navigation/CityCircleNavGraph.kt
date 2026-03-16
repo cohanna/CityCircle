@@ -11,6 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.*
+import com.csci448.kate_lundberg.citycircle.ui.screens.LoginScreen
+import com.csci448.kate_lundberg.citycircle.ui.screens.CreateAccountScreen
+import com.csci448.kate_lundberg.citycircle.ui.screens.PreferencesScreen
+import com.csci448.kate_lundberg.citycircle.ui.screens.ProfileSetupScreen
 import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.CityCircleBottomBar
 import com.csci448.kate_lundberg.citycircle.ui.screens.*
@@ -48,6 +52,16 @@ fun CityCircleNavGraph() {
                     }
                 )
             }
+        }
+        composable("profile_setup") {
+            ProfileSetupScreen(
+                onNextClick = {
+                    navController.navigate("preferences")
+                },
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     ) { innerPadding ->
         NavHost(
