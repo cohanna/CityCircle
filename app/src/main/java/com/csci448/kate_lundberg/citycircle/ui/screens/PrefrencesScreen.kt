@@ -119,6 +119,7 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedSize)
                 },
                 modifier = Modifier
+                    .menuAnchor()
                     .fillMaxWidth()
             )
 

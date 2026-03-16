@@ -28,7 +28,7 @@ fun CityCircleNavGraph() {
     val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
     val shouldShowBottomBar = when (currentRoute) {
-        "home", "search", "profile", "map" -> !isKeyboardVisible
+        "home", "search", "profile", "map", "create_event" -> !isKeyboardVisible
         else -> false
     }
 
