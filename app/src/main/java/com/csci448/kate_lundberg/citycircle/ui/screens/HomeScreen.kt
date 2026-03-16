@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,7 +19,7 @@ import com.csci448.kate_lundberg.citycircle.data.EventRepo
 import com.csci448.kate_lundberg.citycircle.ui.EventCard
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(onCreateEventClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,6 +40,15 @@ fun HomeScreen() {
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onCreateEventClick) {
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = "Create Event",
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -65,5 +76,5 @@ fun HomeScreen() {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    HomeScreen(onCreateEventClick = {})
 }
