@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -14,7 +13,7 @@ import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PreferencesScreen(onBackClick: () -> Unit) {
+fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
 
     var location by remember { mutableStateOf("") }
     var distance by remember { mutableStateOf("") }
@@ -147,7 +146,7 @@ fun PreferencesScreen(onBackClick: () -> Unit) {
             horizontalArrangement = Arrangement.Center
         ) {
             ElevatedButton (
-                onClick = { }, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                onClick = onNextClick, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Blue,
                     contentColor = Cream
@@ -173,5 +172,5 @@ fun PreferencesScreen(onBackClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun PreferencesScreenPreview() {
-    PreferencesScreen(onBackClick = {})
+    PreferencesScreen(onNextClick = {}, onBackClick = {})
 }
