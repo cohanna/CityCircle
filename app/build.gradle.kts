@@ -6,9 +6,7 @@ plugins {
 
 android {
     namespace = "com.csci448.kate_lundberg.citycircle"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.csci448.kate_lundberg.citycircle"
@@ -52,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
