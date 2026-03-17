@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -29,7 +28,7 @@ fun CityCircleNavGraph() {
     val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
     val shouldShowBottomBar = when (currentRoute) {
-        "home", "search", "profile", "map" -> !isKeyboardVisible
+        "home", "search", "profile", "map", "create_event" -> !isKeyboardVisible
         else -> false
     }
 
@@ -53,28 +52,24 @@ fun CityCircleNavGraph() {
                 )
             }
         }
-        composable("profile_setup") {
-            ProfileSetupScreen(
-                onNextClick = {
-                    navController.navigate("preferences")
-                },
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = "login",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeScreen() }
+            composable("home") { 
+                HomeScreen(
+                    onCreateEventClick = {
+                        navController.navigate("create_event")
+                    }
+                ) 
+            }
             
             composable("search") { EventSearchScreen() }
 
             composable("map") { 
-                Text("Map Screen coming soon", modifier = Modifier.padding(16.dp))
+                MapScreen()
             }
 
             composable("profile") {
@@ -96,6 +91,17 @@ fun CityCircleNavGraph() {
             composable("create_account") {
                 CreateAccountScreen(
                     onNextClick = {
+                        navController.navigate("profile_setup")
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable("profile_setup") {
+                ProfileSetupScreen(
+                    onNextClick = {
                         navController.navigate("preferences")
                     },
                     onBackClick = {
@@ -113,6 +119,10 @@ fun CityCircleNavGraph() {
                         navController.popBackStack()
                     }
                 )
+            }
+
+            composable("create_event") {
+                CreateEventScreen()
             }
         }
     }
