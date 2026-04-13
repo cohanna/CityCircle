@@ -54,6 +54,12 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
+
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.play.services.maps)
+    implementation(libs.google.play.services.location)
+    implementation(libs.accompanist.permissions)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
