@@ -1,8 +1,12 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
 
+import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -10,13 +14,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
+import android.Manifest
+import androidx.core.content.ContextCompat
+import android.content.pm.PackageManager
 
 @Composable
 fun ProfileSetupScreen(
@@ -26,17 +36,40 @@ fun ProfileSetupScreen(
 
     val context = LocalContext.current
 
-    var handle by remember { mutableStateOf("") }
     var name by remember { mutableStateOf("") }
     var bio by remember { mutableStateOf("") }
-
     var showLocation by remember { mutableStateOf(true) }
 
+    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
+    var profileImageBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+
+    val imagePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        profileImageUri = uri
+        profileImageBitmap = null
+    }
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        profileImageBitmap = bitmap
+        profileImageUri = null
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraLauncher.launch(null)
+        } else {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(24.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -52,28 +85,66 @@ fun ProfileSetupScreen(
             modifier = Modifier
                 .size(130.dp)
                 .clip(CircleShape)
-                .background(Color.LightGray)
-                .clickable {
-                    Toast.makeText(
-                        context,
-                        "Profile image picker coming soon",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                },
+                .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            Text("Tap to Add Photo")
+
+            if (profileImageBitmap != null) {
+                Image(
+                    bitmap = profileImageBitmap!!.asImageBitmap(),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else if (profileImageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(profileImageUri),
+                    contentDescription = "Profile Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Text("No Image")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = {
+                imagePicker.launch("image/*")
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Blue,
+                contentColor = Cream
+            )
+        ) {
+            Text("Upload Photo")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(
+            onClick = {
+                if (ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    cameraLauncher.launch(null)
+                } else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Blue,
+                contentColor = Cream
+            )
+        ) {
+            Text("Take Photo")
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "@handle",
-            style = MaterialTheme.typography.titleMedium,
-            color = Blue
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = name,
@@ -92,7 +163,6 @@ fun ProfileSetupScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Row {
-
             FilterChip(
                 selected = showLocation,
                 onClick = { showLocation = true },
@@ -166,6 +236,7 @@ fun ProfileSetupScreen(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun ProfileSetupScreenPreview() {
