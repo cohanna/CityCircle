@@ -10,14 +10,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.csci448.kate_lundberg.citycircle.data.Event
 import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
+import java.util.UUID
 
 @Composable
-fun CreateEventScreen() {
-
+fun CreateEventScreen(
+    onCreateEvent: (Event) -> Unit
+) {
     val context = LocalContext.current
-
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
 
@@ -60,11 +62,21 @@ fun CreateEventScreen() {
 
         ElevatedButton(
             onClick = {
-                Toast.makeText(
-                    context,
-                    "Event created (alpha placeholder)",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (title != "" && description != "") {
+                    val newEvent = Event(
+                        id = "event_${UUID.randomUUID()}",
+                        title = title,
+                        description = description
+                    )
+                    onCreateEvent(newEvent)
+                    Toast.makeText(context, "Event created!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Event created (alpha placeholder)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             },
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
             colors = ButtonDefaults.buttonColors(
@@ -80,5 +92,5 @@ fun CreateEventScreen() {
 @Preview(showBackground = true)
 @Composable
 fun CreateEventScreenPreview() {
-    CreateEventScreen()
+    CreateEventScreen( onCreateEvent = {} )
 }
