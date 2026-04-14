@@ -10,6 +10,7 @@
 # - can't actually interact with events (they're not yet clickable)
 # - no landscape mode but also no functionality to lock portrait mode
 # - sometimes map puts you in new york or google HQ after giving location permissions (sometimes releading the app fixes this)
+#- no more fun images for profiles or events (will come back, databases are hard okay)
 #
 # areas you would like feedback on
 # - things to add for a better/more engaging user experience (already considering more community interaction on event pages, people will be able to comment and rate events as well as join an attending list, is there anything else that could be fun to add?)
