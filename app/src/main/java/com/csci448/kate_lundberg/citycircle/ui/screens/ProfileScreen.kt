@@ -1,6 +1,5 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -15,12 +14,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.csci448.kate_lundberg.citycircle.R
+import com.csci448.kate_lundberg.citycircle.data.Event
+import com.csci448.kate_lundberg.citycircle.data.EventRepo
 import com.csci448.kate_lundberg.citycircle.data.User
 import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.EventCard
 
 @Composable
-fun ProfileScreen(user: User) {
+fun ProfileScreen(
+    user: User
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -28,13 +33,15 @@ fun ProfileScreen(user: User) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = user.profilePictureResId),
+        AsyncImage(
+            model = user.profilePictureUrl ?: R.drawable.citycircle_logo,
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
+            placeholder = painterResource(R.drawable.citycircle_logo),
+            error = painterResource(R.drawable.citycircle_logo)
         )
         
         Spacer(modifier = Modifier.height(8.dp))

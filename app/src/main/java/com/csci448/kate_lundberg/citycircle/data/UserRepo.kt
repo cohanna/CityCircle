@@ -1,7 +1,5 @@
 package com.csci448.kate_lundberg.citycircle.data
 
-import com.csci448.kate_lundberg.citycircle.R
-
 object UserRepo {
     val users: List<User> by lazy {
         listOf(
@@ -9,7 +7,7 @@ object UserRepo {
                 name = "Smurfette",
                 username = "smurfette",
                 bio = "the girl",
-                profilePictureResId = R.drawable.smurfette,
+                profilePictureUrl = null,
                 eventsAttended = listOf(),
                 eventsHosted = listOf(EventRepo.events[0], EventRepo.events[1], EventRepo.events[2])
             ),
@@ -21,7 +19,7 @@ object UserRepo {
                         "Prior to the start of Adventure Time, Finn was adopted as an infant by two anthropomorphic dogs named Joshua and Margaret, who found him in the woods. His best friend and adoptive brother Jake the Dog (John DiMaggio) accompany him on many of his adventures in Ooo, the fictional world that the series is set in. The mystery surrounding Finn's origins and whether he is the last human left in Ooo is a major part of the character's narrative arc. Later in the series, it is revealed that there are other humans still living in Ooo and that Finn's parents Martin Mertens and Minerva Campbell came from a community of survivors living on a chain of islands.\n" +
                         "\n" +
                         "Finn has received universal praise for his character development and coming-of-age narrative, which saw the character mature from a boy into a wise young man. Adam Muto, former showrunner for Adventure Time, has stated that Finn's progression from an aggressive and reckless boy into a more mature wise person was one of his favorite character arcs to write. A gender-swapped version of Finn called Fionna appeared in the third-season episode \"Fionna and Cake\" and is the main character of the spin-off series Adventure Time: Fionna & Cake. Finn returns in this aforementioned series as an adult adventurer.",
-                profilePictureResId = R.drawable.finn,
+                profilePictureUrl = null,
                 eventsAttended = listOf(EventRepo.events[0]),
                 eventsHosted = listOf()
             ),
@@ -29,7 +27,7 @@ object UserRepo {
                 name = "Bob",
                 username = "spongebob_sqaure",
                 bio = "a square",
-                profilePictureResId = R.drawable.spongebob,
+                profilePictureUrl = null,
                 eventsAttended = listOf(EventRepo.events[0], EventRepo.events[1], EventRepo.events[2]),
                 eventsHosted = listOf(EventRepo.events[0])
             )

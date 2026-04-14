@@ -13,11 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.csci448.kate_lundberg.citycircle.data.Event
 import com.csci448.kate_lundberg.citycircle.data.EventRepo
 import com.csci448.kate_lundberg.citycircle.ui.EventCard
 
 @Composable
-fun EventSearchScreen() {
+fun EventSearchScreen(
+    events: List<Event>,
+) {
     var searchText by remember { mutableStateOf("") }
 
     Column(
@@ -47,7 +50,7 @@ fun EventSearchScreen() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            items(EventRepo.events) { event ->
+            items(events) { event ->
                 EventCard(event = event)
             }
         }
@@ -57,5 +60,7 @@ fun EventSearchScreen() {
 @Preview(showBackground = true)
 @Composable
 fun EventSearchScreenPreview() {
-    EventSearchScreen()
+    EventSearchScreen(
+        events = EventRepo.events,
+    )
 }
