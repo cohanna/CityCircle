@@ -1,0 +1,60 @@
+package com.csci448.kate_lundberg.citycircle.viewmodel
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.csci448.kate_lundberg.citycircle.data.Event
+import com.csci448.kate_lundberg.citycircle.data.User
+import com.csci448.kate_lundberg.citycircle.util.api.CityCircleFetchr
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+class CityCircleViewModel : ViewModel() {
+
+    companion object {
+        private const val LOG_TAG = "448.CityCircleViewModel"
+    }
+
+    private val _cityCircleFetchr = CityCircleFetchr()
+
+    private val _events = MutableStateFlow<List<Event>>(emptyList())
+    val events: StateFlow<List<Event>> = _events.asStateFlow()
+
+    private val _users = MutableStateFlow<List<User>>(emptyList())
+    val users: StateFlow<List<User>> = _users.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _cityCircleFetchr.eventsFlow.collect { result ->
+                if (result != null) _events.update { result }
+                Log.d(LOG_TAG, "Events from Firebase: $result")
+            }
+        }
+        viewModelScope.launch {
+            _cityCircleFetchr.usersFlow.collect { result ->
+                if (result != null) _users.update { result }
+                Log.d(LOG_TAG, "Users from Firebase: $result")
+            }
+        }
+        _cityCircleFetchr.getEvents()
+        _cityCircleFetchr.getUsers()
+    }
+
+    fun addEvent(event: Event) {
+        _cityCircleFetchr.putEvent(event)
+        _events.update { currentList -> currentList + event }
+    }
+
+    fun addUser(user: User) {
+        _cityCircleFetchr.putUser(user)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _cityCircleFetchr.cancelEventsRequest()
+        _cityCircleFetchr.cancelUsersRequest()
+    }
+}

@@ -1,6 +1,5 @@
 package com.csci448.kate_lundberg.citycircle.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,6 +10,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.csci448.kate_lundberg.citycircle.R
 import com.csci448.kate_lundberg.citycircle.data.Event
 import com.csci448.kate_lundberg.citycircle.data.EventRepo
 
@@ -18,7 +19,7 @@ import com.csci448.kate_lundberg.citycircle.data.EventRepo
 fun EventCard(
     event: Event,
     modifier: Modifier = Modifier,
-    isSmall: Boolean = false
+    isSmall: Boolean = false,
 ) {
     val imageSize = if (isSmall) 40.dp else 80.dp
     val padding = if (isSmall) 8.dp else 16.dp
@@ -58,11 +59,14 @@ fun EventCard(
                 }
             }
             Spacer(modifier = Modifier.width(if (isSmall) 8.dp else 16.dp))
-            Image(
-                painter = painterResource(id = event.imageResId),
+            
+            AsyncImage(
+                model = event.imageUrl ?: R.drawable.citycircle_logo,
                 contentDescription = "Event Image",
                 modifier = Modifier.size(imageSize),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.citycircle_logo),
+                error = painterResource(R.drawable.citycircle_logo)
             )
         }
     }
@@ -73,7 +77,7 @@ fun EventCard(
 fun EventCardListPreview() {
     Column {
         EventRepo.events.forEach { event ->
-            EventCard(event = event)
+            EventCard(event = event, isSmall = false)
         }
     }
 }
