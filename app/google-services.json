@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "881637861830",
+    "firebase_url": "https://citycircle-37f1a-default-rtdb.firebaseio.com",
     "project_id": "citycircle-37f1a",
     "storage_bucket": "citycircle-37f1a.firebasestorage.app"
   },
@@ -12,7 +13,12 @@
           "package_name": "com.csci448.kate_lundberg.citycircle"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "881637861830-unmkv8fo2nih8i6td83klcgva5m10dud.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCuScRkeQvIdcdGG-PgfQ2z2mzrz7L1kcQ"
@@ -20,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881637861830-unmkv8fo2nih8i6td83klcgva5m10dud.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

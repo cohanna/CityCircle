@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.csci448.kate_lundberg.citycircle.ui.screens.LoginScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.CreateAccountScreen
@@ -17,10 +19,11 @@ import com.csci448.kate_lundberg.citycircle.ui.screens.ProfileSetupScreen
 import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.CityCircleBottomBar
 import com.csci448.kate_lundberg.citycircle.ui.screens.*
+import com.csci448.kate_lundberg.citycircle.viewmodel.CityCircleViewModel
 
 @Composable
 fun CityCircleNavGraph() {
-
+    val viewModel: CityCircleViewModel = viewModel()
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -58,23 +61,28 @@ fun CityCircleNavGraph() {
             startDestination = "login",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { 
+            composable("home") {
+                val events by viewModel.events.collectAsState()
                 HomeScreen(
-                    onCreateEventClick = {
-                        navController.navigate("create_event")
-                    }
-                ) 
+                    events = events,
+                    onCreateEventClick = { navController.navigate("create_event") }
+                )
             }
-            
-            composable("search") { EventSearchScreen() }
 
             composable("map") { 
                 MapScreen()
             }
 
+            composable("search") {
+                val events by viewModel.events.collectAsState()
+                EventSearchScreen(events = events)
+            }
+
             composable("profile") {
-                //hardcoded for now, change later
-                ProfileScreen(user = UserRepo.users[1])
+                val users by viewModel.users.collectAsState()
+                val user = users.firstOrNull { it.username == "smurfette" }
+                    ?: UserRepo.users[0] //just in case nothing else exists
+                ProfileScreen(user = user)
             }
 
             composable("login") {
@@ -122,7 +130,12 @@ fun CityCircleNavGraph() {
             }
 
             composable("create_event") {
-                CreateEventScreen()
+                CreateEventScreen(
+                    onCreateEvent = { event->
+                        viewModel.addEvent(event)
+                        navController.navigate("home")
+                    }
+                )
             }
         }
     }
