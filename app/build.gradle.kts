@@ -56,6 +56,12 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
+
+    implementation(libs.google.maps.compose)
+    implementation(libs.google.play.services.maps)
+    implementation(libs.google.play.services.location)
+    implementation(libs.accompanist.permissions)
+
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.kotlinx)
     implementation(libs.kotlinx.serialization.json)
