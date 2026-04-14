@@ -11,12 +11,19 @@ import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 import androidx.compose.ui.res.painterResource
 import com.csci448.kate_lundberg.citycircle.R
+import com.google.firebase.auth.FirebaseAuth
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 
 @Composable
-fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
+fun LoginScreen(onCreateAccountClick: () -> Unit, onLoginSuccess: () -> Unit) {
 
-    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val auth = FirebaseAuth.getInstance()
 
     Column(
         modifier = Modifier
@@ -34,9 +41,9 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
         Spacer(modifier = Modifier.height(40.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") }
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -49,12 +56,27 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ElevatedButton (onClick = onSignInClick,
+        ElevatedButton(
+            onClick = {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            onLoginSuccess()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Invalid email or password",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+            },
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Blue,
                 contentColor = Cream
-            )) {
+            )
+        ) {
             Text("Sign In")
         }
 
@@ -74,5 +96,5 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(onSignInClick = {}, onCreateAccountClick = {})
+    LoginScreen(onCreateAccountClick = {}, onLoginSuccess = {})
 }

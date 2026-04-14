@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.gms.google.services)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.google.ksp)
 }
@@ -56,6 +57,10 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.kotlinx)
     implementation(libs.kotlinx.serialization.json)

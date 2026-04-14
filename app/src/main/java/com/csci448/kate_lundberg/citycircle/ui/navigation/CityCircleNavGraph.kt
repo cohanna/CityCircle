@@ -90,7 +90,7 @@ fun CityCircleNavGraph() {
                     onCreateAccountClick = {
                         navController.navigate("create_account")
                     },
-                    onSignInClick = {
+                    onLoginSuccess = {
                         navController.navigate("home")
                     }
                 )

@@ -1,26 +1,16 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
 
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.auth.FirebaseAuth
 import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
-
 
 @Composable
 fun CreateAccountScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
@@ -29,18 +19,12 @@ fun CreateAccountScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    var profileImageUri by remember { mutableStateOf<Uri?>(null) }
-
-    val imagePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        profileImageUri = uri
-    }
+    val auth = FirebaseAuth.getInstance()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(70.dp),
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -49,44 +33,6 @@ fun CreateAccountScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
             fontSize = 28.sp,
             color = Blue
         )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (profileImageUri != null) {
-
-            Image(
-                painter = rememberAsyncImagePainter(profileImageUri),
-                contentDescription = "Profile Image",
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-
-        } else {
-
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No Image")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Button(
-            onClick = { imagePicker.launch("image/*") },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Blue,
-                contentColor = Cream
-            )
-        ) {
-            Text("Upload Profile Picture")
-        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -115,12 +61,21 @@ fun CreateAccountScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center
         ) {
-            ElevatedButton (
-                onClick = { onNextClick() },
+
+            ElevatedButton(
+                onClick = {
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                onNextClick()
+                            } else {
+                                println("Signup failed: ${task.exception?.message}")
+                            }
+                        }
+                },
                 elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Blue,
@@ -129,7 +84,9 @@ fun CreateAccountScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
             ) {
                 Text("Next")
             }
+
             Spacer(modifier = Modifier.width(24.dp))
+
             ElevatedButton(
                 onClick = onBackClick,
                 elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
