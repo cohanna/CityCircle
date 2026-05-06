@@ -30,9 +30,11 @@ fun CityCircleNavGraph() {
 
     val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
-    val shouldShowBottomBar = when (currentRoute) {
-        "home", "search", "profile", "map", "create_event", "event_detail/{eventId}" -> !isKeyboardVisible
-        else -> false
+    val shouldShowBottomBar = when {
+        currentRoute == null -> false
+        currentRoute.startsWith("event_detail") -> false
+        isKeyboardVisible -> false
+        else -> currentRoute in listOf("home", "search", "profile", "map", "create_event")
     }
 
     Scaffold(
@@ -64,21 +66,24 @@ fun CityCircleNavGraph() {
             composable("home") {
                 val events by viewModel.events.collectAsState()
                 HomeScreen(
-                    events = events,
+                    events = events.filter { it.title.isNotBlank() },
                     onCreateEventClick = { navController.navigate("create_event") },
-                    onEventClick = { event -> navController.navigate("event_datial/${event.id}")}
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
                 )
             }
 
-            composable("map") { 
-                MapScreen()
+            composable("map") {
+                val events by viewModel.events.collectAsState()
+                MapScreen(
+                    events.filter { it.latitude != null && it.longitude != null }
+                )
             }
 
             composable("search") {
                 val events by viewModel.events.collectAsState()
                 EventSearchScreen(
-                    events = events,
-                    onEventClick = { event -> navController.navigate("event_datial/${event.id}")}
+                    events = events.filter { it.title.isNotBlank() },
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
                 )
             }
 
@@ -143,7 +148,7 @@ fun CityCircleNavGraph() {
                 )
             }
 
-            composable("event_detail/{eventId") { backStackEntry ->
+            composable("event_detail/{eventId}") { backStackEntry ->
                 val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
                 val events by viewModel.events.collectAsState()
                 val users by viewModel.users.collectAsState()

@@ -4,6 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +17,8 @@ import androidx.compose.ui.unit.sp
 import com.csci448.kate_lundberg.citycircle.data.Event
 import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
+import com.csci448.kate_lundberg.citycircle.utils.LocationUtils
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 @Composable
@@ -27,6 +31,11 @@ fun CreateEventScreen(
     var description by remember { mutableStateOf("") }
     var locationName by remember { mutableStateOf("") }
     var titleError by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val locationUtils = remember { LocationUtils(context) }
+    var latitude by remember { mutableStateOf<Double?>(null) }
+    var longitude by remember { mutableStateOf<Double?>(null) }
+    var locationError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -79,8 +88,12 @@ fun CreateEventScreen(
 
         OutlinedTextField(
             value = locationName,
-            onValueChange = { locationName = it },
-            label = { Text("Location") },
+            onValueChange = {
+                locationName = it
+                locationError = false
+            },
+            label = { Text("Location:") },
+            isError = locationError,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -92,15 +105,30 @@ fun CreateEventScreen(
                     titleError = true
                     Toast.makeText(context, "Event must have a title", Toast.LENGTH_SHORT).show()
                 } else {
-                    val newEvent = Event(
-                        id = "event_${UUID.randomUUID()}",
-                        title = title,
-                        description = description,
-                        createdBy = currentUsername,
-                        locationName = locationName
-                    )
-                    onCreateEvent(newEvent)
-                    Toast.makeText(context, "Event created!", Toast.LENGTH_SHORT).show()
+                    scope.launch {
+                        if (locationName.isNotBlank()) {
+                            val coords = locationUtils.getLocationFromAddress(locationName)
+                            if (coords != null) {
+                                latitude = coords.first
+                                longitude = coords.second
+                                locationError = false
+                            } else {
+                                locationError = true
+                                return@launch
+                            }
+                        }
+                        val newEvent = Event(
+                            id = "event_${UUID.randomUUID()}",
+                            title = title,
+                            description = description,
+                            createdBy = currentUsername,
+                            locationName = locationName,
+                            latitude = latitude,
+                            longitude = longitude
+                        )
+                        onCreateEvent(newEvent)
+                        Toast.makeText(context, "Event created!", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),

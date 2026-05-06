@@ -3,10 +3,12 @@ package com.csci448.kate_lundberg.citycircle.utils
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.Locale
 import kotlin.coroutines.resume
 
 class LocationUtils(private val context: Context) {
@@ -45,5 +47,31 @@ class LocationUtils(private val context: Context) {
                     context,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    suspend fun getAddressFromLocation(latitude: Double, longitude: Double): String {
+        return suspendCancellableCoroutine { continuation ->
+            val geocoder = Geocoder(context, Locale.getDefault())
+            geocoder.getFromLocation(latitude, longitude, 1) { addresses ->
+                if (addresses.isNotEmpty()) {
+                    continuation.resume(addresses[0].getAddressLine(0))
+                } else {
+                    continuation.resume("Address not found")
+                }
+            }
+        }
+    }
+
+    suspend fun getLocationFromAddress(address: String): Pair<Double, Double>? {
+        return suspendCancellableCoroutine { continuation ->
+            val geocoder = Geocoder(context, Locale.getDefault())
+            geocoder.getFromLocationName(address, 1) { addresses ->
+                if (addresses.isNotEmpty()) {
+                    continuation.resume(Pair(addresses[0].latitude, addresses[0].longitude))
+                } else {
+                    continuation.resume(null)
+                }
+            }
+        }
     }
 }

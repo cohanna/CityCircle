@@ -54,7 +54,7 @@ fun EventCard(
                 if (!isSmall) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = event.description,
+                        text = event.description.take(300),
                         style = bodyStyle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
