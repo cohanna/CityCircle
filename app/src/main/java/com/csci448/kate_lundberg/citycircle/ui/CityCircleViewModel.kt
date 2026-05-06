@@ -46,6 +46,18 @@ class CityCircleViewModel : ViewModel() {
     fun addEvent(event: Event) {
         _cityCircleFetchr.putEvent(event)
         _events.update { currentList -> currentList + event }
+        val updatedUsers = _users.value.map { user ->
+            if (user.username == event.createdBy) {
+                user.copy(eventsHosted = user.eventsHosted + event)
+            } else {
+                user
+            }
+        }
+        _users.update { updatedUsers }
+        val updatedHost = updatedUsers.firstOrNull() { it.username == event.createdBy }
+        if (updatedHost != null) {
+            _cityCircleFetchr.putUser(updatedHost)
+        }
     }
 
     fun addUser(user: User) {

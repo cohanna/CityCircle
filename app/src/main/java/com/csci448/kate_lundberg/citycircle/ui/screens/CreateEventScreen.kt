@@ -2,6 +2,8 @@ package com.csci448.kate_lundberg.citycircle.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,17 +19,20 @@ import java.util.UUID
 
 @Composable
 fun CreateEventScreen(
+    currentUsername: String,
     onCreateEvent: (Event) -> Unit
 ) {
     val context = LocalContext.current
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var locationName by remember { mutableStateOf("") }
+    var titleError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(24.dp),
-
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -42,8 +47,20 @@ fun CreateEventScreen(
 
         OutlinedTextField(
             value = title,
-            onValueChange = { title = it },
-            label = { Text("Event Title") },
+            onValueChange = {
+                title = it
+                if (it.isNotBlank()) titleError = false
+                            },
+            label = { Text("Event Title *") },
+            isError = titleError,
+            supportingText = {
+                if (titleError) {
+                    Text(
+                        text = "Event must have a title",   //make strings.xml value
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -58,24 +75,32 @@ fun CreateEventScreen(
                 .height(150.dp)
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = locationName,
+            onValueChange = { locationName = it },
+            label = { Text("Location") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(24.dp))
 
         ElevatedButton(
             onClick = {
-                if (title != "" && description != "") {
+                if (title.isBlank()) { //add if for description and location too lowk
+                    titleError = true
+                    Toast.makeText(context, "Event must have a title", Toast.LENGTH_SHORT).show()
+                } else {
                     val newEvent = Event(
                         id = "event_${UUID.randomUUID()}",
                         title = title,
-                        description = description
+                        description = description,
+                        createdBy = currentUsername,
+                        locationName = locationName
                     )
                     onCreateEvent(newEvent)
                     Toast.makeText(context, "Event created!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Event created (alpha placeholder)",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             },
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
@@ -92,5 +117,5 @@ fun CreateEventScreen(
 @Preview(showBackground = true)
 @Composable
 fun CreateEventScreenPreview() {
-    CreateEventScreen( onCreateEvent = {} )
+    CreateEventScreen( currentUsername = "me", onCreateEvent = {} )
 }

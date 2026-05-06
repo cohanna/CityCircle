@@ -20,6 +20,7 @@ import com.csci448.kate_lundberg.citycircle.ui.EventCard
 @Composable
 fun EventSearchScreen(
     events: List<Event>,
+    onEventClick: (Event) -> Unit
 ) {
     var searchText by remember { mutableStateOf("") }
 
@@ -62,5 +63,6 @@ fun EventSearchScreen(
 fun EventSearchScreenPreview() {
     EventSearchScreen(
         events = EventRepo.events,
+        onEventClick = {}
     )
 }
