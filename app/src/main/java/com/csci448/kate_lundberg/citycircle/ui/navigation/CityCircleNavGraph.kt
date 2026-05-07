@@ -12,12 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
+import com.csci448.kate_lundberg.citycircle.data.User
 import com.csci448.kate_lundberg.citycircle.ui.screens.LoginScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.CreateAccountScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.PreferencesScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.ProfileSetupScreen
 import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.CityCircleBottomBar
+import com.csci448.kate_lundberg.citycircle.ui.UserAuthViewModel
 import com.csci448.kate_lundberg.citycircle.ui.screens.*
 import com.csci448.kate_lundberg.citycircle.viewmodel.CityCircleViewModel
 
@@ -36,6 +38,9 @@ fun CityCircleNavGraph() {
         isKeyboardVisible -> false
         else -> currentRoute in listOf("home", "search", "profile", "map", "create_event")
     }
+
+    val userAuthViewModel: UserAuthViewModel = viewModel()
+    val currentUser by userAuthViewModel.currentUser.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -90,44 +95,54 @@ fun CityCircleNavGraph() {
 
             composable("profile") {
                 val users by viewModel.users.collectAsState()
-                val user = users.firstOrNull { it.username == "smurfette" }
+                val user = users.firstOrNull { it.username == userAuthViewModel.currentUsername }
                     ?: UserRepo.users[0] //just in case nothing else exists
                 ProfileScreen(
                     user = user,
-                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
+                    onEventClick = { event ->
+                        navController.navigate("event_detail/${event.id}")
+                    },
+                    onSignOut = {
+                        userAuthViewModel.signOut()
+                        navController.navigate("login")
+                    }
                 )
             }
 
             composable("login") {
                 LoginScreen(
+                    userAuthViewModel = userAuthViewModel,
+                    onSignInSuccess = {
+                        navController.navigate("home")
+                    },
                     onCreateAccountClick = {
                         navController.navigate("create_account")
                     },
-                    onSignInClick = {
-                        navController.navigate("home")
-                    }
                 )
             }
 
             composable("create_account") {
                 CreateAccountScreen(
-                    onNextClick = {
-                        navController.navigate("profile_setup")
-                    },
+                    userAuthViewModel = userAuthViewModel,
+                    cityCircleViewModel = viewModel,
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    onNextClick = {
+                        navController.navigate("profile_setup")
                     }
                 )
             }
 
             composable("profile_setup") {
+                val users by viewModel.users.collectAsState()
+                val user = users.firstOrNull { it.username == userAuthViewModel.currentUsername }
+                    ?: return@composable
                 ProfileSetupScreen(
-                    onNextClick = {
-                        navController.navigate("preferences")
-                    },
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
+                    currentUser = user,
+                    cityCircleViewModel = viewModel,
+                    onNextClick = { navController.navigate("preferences") },
+                    onBackClick = { navController.popBackStack() }
                 )
             }
 
@@ -144,7 +159,7 @@ fun CityCircleNavGraph() {
 
             composable("create_event") {
                 CreateEventScreen(
-                    currentUsername = "smurfette", //CHANGE TO DYNAMIC ONCE AUTH SET UP!!!
+                    currentUsername = userAuthViewModel.currentUsername,
                     onCreateEvent = { event->
                         viewModel.addEvent(event)
                         navController.navigate("home")
@@ -173,7 +188,11 @@ fun CityCircleNavGraph() {
                 val user = users.firstOrNull { it.username == username } ?: return@composable
                 ProfileScreen(
                     user = user,
-                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")},
+                    onSignOut = {
+                        userAuthViewModel.signOut()
+                        navController.navigate("login")
+                    }
                 )
             }
         }

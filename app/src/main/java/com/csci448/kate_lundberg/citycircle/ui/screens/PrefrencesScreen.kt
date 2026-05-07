@@ -147,23 +147,25 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
             horizontalArrangement = Arrangement.Center
         ) {
             ElevatedButton (
-                onClick = onNextClick, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Blue,
-                    contentColor = Cream
-                )
-            ) {
-                Text("Next")
-            }
-            Spacer(modifier = Modifier.width(24.dp))
-            ElevatedButton (
-                onClick = onBackClick, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                onClick = onBackClick,
+                elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Blue,
                     contentColor = Cream
                 )
             ) {
                 Text("Back")
+            }
+            Spacer(modifier = Modifier.width(24.dp))
+            ElevatedButton (
+                onClick = onNextClick,
+                elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Blue,
+                    contentColor = Cream
+                )
+            ) {
+                Text("Next")
             }
         }
 

@@ -12,5 +12,7 @@ data class Event(
     val latitude: Double? = null,
     val longitude: Double? = null,
     val locationName: String = "",
-    val attendees: List<String> = emptyList()
+    val attendees: List<String> = emptyList(),
+    val date: String = "",
+    val cost: String = ""
 )

@@ -35,8 +35,27 @@ class CityCircleViewModel : ViewModel() {
         }
         viewModelScope.launch {
             _cityCircleFetchr.usersFlow.collect { result ->
-                if (result != null) _users.update { result }
-                Log.d(LOG_TAG, "Users from Firebase: $result")
+//                if (result != null) _users.update { result }
+//                Log.d(LOG_TAG, "Users from Firebase: $result")
+                if (result != null) {
+                    _users.update { currentList ->
+                        if (currentList.isEmpty()) {
+                            result
+                        } else {
+                            // Merge: keep local version if it has more data
+                            result.map { incoming ->
+                                val local = currentList.firstOrNull { it.username == incoming.username }
+                                if (local?.profilePictureUrl != null && incoming.profilePictureUrl == null) {
+                                    local
+                                } else {
+                                    incoming
+                                }
+                            } + currentList.filter { local ->
+                                result.none { it.username == local.username }
+                            }
+                        }
+                    }
+                }
             }
         }
         _cityCircleFetchr.getEvents()
@@ -56,12 +75,23 @@ class CityCircleViewModel : ViewModel() {
         _users.update { updatedUsers }
         val updatedHost = updatedUsers.firstOrNull() { it.username == event.createdBy }
         if (updatedHost != null) {
-            _cityCircleFetchr.putUser(updatedHost)
+            _cityCircleFetchr.putUser(updatedHost) {}
         }
     }
 
-    fun addUser(user: User) {
-        _cityCircleFetchr.putUser(user)
+    fun addUser(user: User, onCompleted: () -> Unit = {}) {
+        _users.update { currentList -> currentList + user }
+       onCompleted()
+        _cityCircleFetchr.putUser(user) {}
+    }
+
+    fun updateUser(user: User, onCompleted: () -> Unit = {}) {
+        _cityCircleFetchr.putUser(user, onCompleted)
+        _users.update { currentList ->
+            currentList.map {
+                if (it.username == user.username) user else it
+            }
+        }
     }
 
     override fun onCleared() {

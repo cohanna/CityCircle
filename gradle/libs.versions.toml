@@ -24,6 +24,7 @@ kotlinxJson = "1.11.0"
 firebaseStorage = "21.0.1"
 googleServices = "4.4.2"
 ucrop = "2.2.9"
+firebaseAuth = "23.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -57,6 +58,7 @@ google-play-services-location = { module = "com.google.android.gms:play-services
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorage" }
 ucrop = { group = "com.github.yalantis", name = "ucrop", version.ref = "ucrop" }
+firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

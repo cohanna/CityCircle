@@ -1,10 +1,11 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -19,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.csci448.kate_lundberg.citycircle.R
 import com.csci448.kate_lundberg.citycircle.data.Event
-import com.csci448.kate_lundberg.citycircle.data.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,108 +28,154 @@ fun EventDetailScreen(
     onBack: () -> Unit,
     onHostClick: (String) -> Unit
 ) {
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         //back + title
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { onBack() }) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+
+        item{
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { onBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back"
+                    )
+                }
+                Text(
+                    event.title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(0.8f)
                 )
             }
-            Text(
-                event.title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(0.8f)
-            )
         }
 
         //image
-        AsyncImage(
-            model = event.imageUrl,
-            contentDescription = "Event Image",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.citycircle_logo),
-            error = painterResource(R.drawable.citycircle_logo)
-        )
+        item{
+            AsyncImage(
+                model = event.imageUrl,
+                contentDescription = "Event Image",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(R.drawable.citycircle_logo),
+                error = painterResource(R.drawable.citycircle_logo)
+            )
+        }
 
-        Column(modifier = Modifier.padding(16.dp)) {
-            //location
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = "Location",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+        item{
+            Column(modifier = Modifier.padding(16.dp)) {
+                //location
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = "Location",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = event.locationName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+
+                //host
+                TextButton(
+                    onClick = { onHostClick(event.createdBy) },
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Host",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Hosted by ${event.createdBy}")
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+                //date
+                if (event.date.isNotBlank()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = "Date",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = event.date,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                //cost
+                if (event.cost.isNotBlank()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.AttachMoney,
+                            contentDescription = "Cost",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = event.cost,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(12.dp))
+
+                //about
+                if (event.description.isNotBlank()) {
+                    Text(
+                        text = "About",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = event.description,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
                 Text(
-                    text = event.locationName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-
-            //host
-            TextButton(
-                onClick = { onHostClick(event.createdBy) },
-                contentPadding = PaddingValues(0.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Host",
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Hosted by ${event.createdBy}")
-            }
-
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(12.dp))
-
-            //about
-            if (event.description.isNotBlank()) {
-                Text(
-                    text = "About",
+                    text = "Attendees (${event.attendees.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = event.description,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-
-            Text(
-                text = "Attendees (${event.attendees.size})",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            if (event.attendees.isEmpty()) {
-                Text(
-                    text = "No one yet — be the first!",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            } else {
-                event.attendees.forEach { username ->
+                if (event.attendees.isEmpty()) {
                     Text(
-                        text = "@$username",
+                        text = "No one yet — be the first!",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 2.dp)
+                        color = MaterialTheme.colorScheme.outline
                     )
+                } else {
+                    event.attendees.forEach { username ->
+                        Text(
+                            text = "@$username",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    }
                 }
             }
         }
