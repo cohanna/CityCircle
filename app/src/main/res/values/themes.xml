@@ -2,4 +2,7 @@
 <resources>
 
     <style name="Theme.CityCircle" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="UCropTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fitsSystemWindows">true</item>
+    </style>
 </resources>

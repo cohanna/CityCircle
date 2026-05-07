@@ -24,7 +24,8 @@ import com.csci448.kate_lundberg.citycircle.ui.EventCard
 
 @Composable
 fun ProfileScreen(
-    user: User
+    user: User,
+    onEventClick: (Event) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -88,7 +89,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         user.eventsAttended.forEach { event ->
-                            EventCard(event = event, isSmall = hasHosted)
+                            EventCard(event = event, isSmall = hasHosted, onClick = { onEventClick(event) })
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -110,7 +111,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         user.eventsHosted.forEach { event ->
-                            EventCard(event = event, isSmall = hasAttended)
+                            EventCard(event = event, isSmall = hasAttended, onClick = { onEventClick(event) })
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -130,17 +131,17 @@ fun ProfileScreen(
 @Preview(showBackground = true)
 @Composable
 fun SmurfettePreview() {
-    ProfileScreen(user = UserRepo.users[0])
+    ProfileScreen(user = UserRepo.users[0], onEventClick = {})
 }
 
 @Preview(showBackground = true)
 @Composable
 fun FinnPreview() {
-    ProfileScreen(user = UserRepo.users[1])
+    ProfileScreen(user = UserRepo.users[1], onEventClick = {})
 }
 
 @Preview(showBackground = true)
 @Composable
 fun BobPreview() {
-    ProfileScreen(user = UserRepo.users[2])
+    ProfileScreen(user = UserRepo.users[2], onEventClick = {})
 }

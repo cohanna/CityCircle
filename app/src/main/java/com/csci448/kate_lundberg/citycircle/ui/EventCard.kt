@@ -64,7 +64,7 @@ fun EventCard(
             Spacer(modifier = Modifier.width(if (isSmall) 8.dp else 16.dp))
             
             AsyncImage(
-                model = event.imageUrl ?: R.drawable.citycircle_logo,
+                model = event.imageUrl,
                 contentDescription = "Event Image",
                 modifier = Modifier.size(imageSize),
                 contentScale = ContentScale.Crop,

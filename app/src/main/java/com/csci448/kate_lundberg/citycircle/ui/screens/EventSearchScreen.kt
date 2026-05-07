@@ -52,7 +52,10 @@ fun EventSearchScreen(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             items(events) { event ->
-                EventCard(event = event)
+                EventCard(
+                    event = event,
+                    onClick = { onEventClick(event) }
+                )
             }
         }
     }

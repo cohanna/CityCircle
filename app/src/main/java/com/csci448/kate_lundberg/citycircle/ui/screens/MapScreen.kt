@@ -22,7 +22,7 @@ import com.csci448.kate_lundberg.citycircle.data.Event
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MapScreen(events: List<Event>) {
+fun MapScreen(events: List<Event>, onEventClick: (Event) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val locationUtils = remember { LocationUtils(context) }
@@ -102,7 +102,8 @@ fun MapScreen(events: List<Event>) {
                         Marker(
                             state = MarkerState(position = LatLng(event.latitude!!, event.longitude!!)),
                             title = event.title,
-                            snippet = event.description
+                            snippet = event.description,
+                            onInfoWindowClick = { onEventClick(event) }
                         )
                     }
                 }
@@ -177,7 +178,8 @@ fun MapScreenPreview() {
                     latitude = 40.0,
                     longitude = -74.0
                 )
-            )
+            ),
+            onEventClick = {}
         )
     }
 }
