@@ -1,22 +1,30 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.csci448.kate_lundberg.citycircle.ui.theme.Blue
 import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 import androidx.compose.ui.res.painterResource
 import com.csci448.kate_lundberg.citycircle.R
+import com.csci448.kate_lundberg.citycircle.ui.UserAuthViewModel
 
 @Composable
-fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
-
-    var username by remember { mutableStateOf("") }
+fun LoginScreen(
+    userAuthViewModel: UserAuthViewModel,
+    onSignInSuccess: () -> Unit,
+    onCreateAccountClick: () -> Unit
+) {
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    var isLoading by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier
@@ -34,9 +42,9 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
         Spacer(modifier = Modifier.height(40.dp))
 
         OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Username") }
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -49,7 +57,27 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        ElevatedButton (onClick = onSignInClick,
+        ElevatedButton (
+            onClick = {
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(context, "Please enter a username and password", Toast.LENGTH_SHORT).show()
+                } else {
+                    isLoading = true
+                    userAuthViewModel.signIn(
+                        email = email,
+                        password = password,
+                        onSuccess = {
+                            isLoading = false
+                            onSignInSuccess()
+                        },
+                        onError = { errorMessage ->
+                            isLoading = false
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }
+            },
+            enabled = !isLoading,
             elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Blue,
@@ -69,10 +97,4 @@ fun LoginScreen(onSignInClick: () -> Unit, onCreateAccountClick: () -> Unit) {
             Text("Create Account")
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    LoginScreen(onSignInClick = {}, onCreateAccountClick = {})
 }

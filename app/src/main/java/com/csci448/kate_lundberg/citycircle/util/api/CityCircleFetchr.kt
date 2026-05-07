@@ -125,16 +125,29 @@ class CityCircleFetchr {
     }
 
     private var _putUserRequest: Call<User>? = null
-    fun putUser(user: User) {
+    fun putUser(user: User, onCompleted: () -> Unit) {
         _putUserRequest?.cancel()
         _putUserRequest = cityCircleApiService.putUser(user.username, user)
         _putUserRequest?.enqueue(object : Callback<User> {
             override fun onFailure(call: Call<User>, t: Throwable) {
                 Log.e(LOG_TAG, "putUser onFailure() called $t")
+                onCompleted()
             }
-
             override fun onResponse(call: Call<User>, response: Response<User>) {
                 Log.d(LOG_TAG, "putUser onResponse() called for user: ${user.username}")
+                onCompleted()
+            }
+        })
+    }
+
+    fun getUserByEmail(email: String, onResult: (User?) -> Unit) {
+        cityCircleApiService.getUsers().enqueue(object : Callback<Map<String, User>> {
+            override fun onFailure(call: Call<Map<String, User>>, t: Throwable) {
+                onResult(null)
+            }
+            override fun onResponse(call: Call<Map<String, User>>, response: Response<Map<String, User>>) {
+                val user = response.body()?.values?.firstOrNull { it.email == email }
+                onResult(user)
             }
         })
     }

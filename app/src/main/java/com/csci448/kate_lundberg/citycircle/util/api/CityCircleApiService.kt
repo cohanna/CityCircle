@@ -14,7 +14,7 @@ interface CityCircleApiService {
     fun getEvents(): Call<Map<String, Event>>
 
     @GET("events/{id}.json")
-    fun getEvent(@Path("id") eventId: String): Call<Event>
+    suspend fun getEvent(@Path("id") eventId: String): Call<Event>
 
     @PUT("events/{id}.json")
     fun putEvent(@Path("id") eventId: String, @Body event: Event): Call<Event>

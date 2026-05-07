@@ -1,5 +1,6 @@
 package com.csci448.kate_lundberg.citycircle.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,6 +21,7 @@ fun EventCard(
     event: Event,
     modifier: Modifier = Modifier,
     isSmall: Boolean = false,
+    onClick: () -> Unit = {}
 ) {
     val imageSize = if (isSmall) 40.dp else 80.dp
     val padding = if (isSmall) 8.dp else 16.dp
@@ -29,7 +31,8 @@ fun EventCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(if (isSmall) 4.dp else 8.dp),
+            .padding(if (isSmall) 4.dp else 8.dp)
+            .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = if (isSmall) 2.dp else 4.dp)
     ) {
         Row(
@@ -51,7 +54,7 @@ fun EventCard(
                 if (!isSmall) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = event.description,
+                        text = event.description.take(300),
                         style = bodyStyle,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
@@ -61,7 +64,7 @@ fun EventCard(
             Spacer(modifier = Modifier.width(if (isSmall) 8.dp else 16.dp))
             
             AsyncImage(
-                model = event.imageUrl ?: R.drawable.citycircle_logo,
+                model = event.imageUrl,
                 contentDescription = "Event Image",
                 modifier = Modifier.size(imageSize),
                 contentScale = ContentScale.Crop,

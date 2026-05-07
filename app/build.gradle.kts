@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -56,15 +57,16 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.navigation)
     implementation(libs.kotlin.reflect)
-
     implementation(libs.google.maps.compose)
     implementation(libs.google.play.services.maps)
     implementation(libs.google.play.services.location)
     implementation(libs.accompanist.permissions)
-
     implementation(libs.squareup.retrofit)
     implementation(libs.squareup.retrofit.converter.kotlinx)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.firebase.storage.ktx)
+    implementation(libs.ucrop)
+    implementation(libs.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

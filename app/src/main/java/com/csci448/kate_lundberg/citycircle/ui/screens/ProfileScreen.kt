@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,19 +15,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.csci448.kate_lundberg.citycircle.R
 import com.csci448.kate_lundberg.citycircle.data.Event
-import com.csci448.kate_lundberg.citycircle.data.EventRepo
 import com.csci448.kate_lundberg.citycircle.data.User
-import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.EventCard
 
 @Composable
 fun ProfileScreen(
-    user: User
+    user: User,
+    onEventClick: (Event) -> Unit,
+    onSignOut: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -33,8 +35,9 @@ fun ProfileScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        //display profile picture
         AsyncImage(
-            model = user.profilePictureUrl ?: R.drawable.citycircle_logo,
+            model = user.profilePictureUrl,
             contentDescription = "Profile Picture",
             modifier = Modifier
                 .size(120.dp)
@@ -45,21 +48,38 @@ fun ProfileScreen(
         )
         
         Spacer(modifier = Modifier.height(8.dp))
-        
+
+        //username
         Text(
-            text = user.name,
+            text = "@${user.username}",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
-        
-        Text(
-            text = "@${user.username}",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.secondary
-        )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
+        //location
+        if (user.location.isNotBlank()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "Location",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = user.location,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        //bio
         Text(
             text = user.bio,
             style = MaterialTheme.typography.bodyMedium,
@@ -88,7 +108,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         user.eventsAttended.forEach { event ->
-                            EventCard(event = event, isSmall = hasHosted)
+                            EventCard(event = event, isSmall = hasHosted, onClick = { onEventClick(event) })
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -110,7 +130,7 @@ fun ProfileScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         user.eventsHosted.forEach { event ->
-                            EventCard(event = event, isSmall = hasAttended)
+                            EventCard(event = event, isSmall = hasAttended, onClick = { onEventClick(event) })
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
@@ -124,23 +144,23 @@ fun ProfileScreen(
                 modifier = Modifier.padding(top = 32.dp)
             )
         }
+
+        //sign out
+        Spacer(modifier = Modifier.height(24.dp))
+        OutlinedButton(
+            onClick = onSignOut,
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.error
+            ),
+
+        ) {
+            Text("Sign Out")
+            Icon(
+                imageVector = Icons.Default.ExitToApp,
+                contentDescription = "Sign Out",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SmurfettePreview() {
-    ProfileScreen(user = UserRepo.users[0])
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FinnPreview() {
-    ProfileScreen(user = UserRepo.users[1])
-}
-
-@Preview(showBackground = true)
-@Composable
-fun BobPreview() {
-    ProfileScreen(user = UserRepo.users[2])
-}

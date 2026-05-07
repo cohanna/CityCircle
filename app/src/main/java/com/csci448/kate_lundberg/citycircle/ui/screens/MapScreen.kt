@@ -18,10 +18,11 @@ import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 import com.csci448.kate_lundberg.citycircle.utils.LocationUtils
 import kotlinx.coroutines.launch
 import androidx.compose.ui.tooling.preview.Preview
+import com.csci448.kate_lundberg.citycircle.data.Event
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MapScreen() {
+fun MapScreen(events: List<Event>, onEventClick: (Event) -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val locationUtils = remember { LocationUtils(context) }
@@ -97,6 +98,14 @@ fun MapScreen() {
                             snippet = "You are here"
                         )
                     }
+                    events.filter { it.latitude != null && it.longitude != null }.forEach { event ->
+                        Marker(
+                            state = MarkerState(position = LatLng(event.latitude!!, event.longitude!!)),
+                            title = event.title,
+                            snippet = event.description,
+                            onInfoWindowClick = { onEventClick(event) }
+                        )
+                    }
                 }
             }
 
@@ -149,6 +158,28 @@ fun MapScreen() {
 @Composable
 fun MapScreenPreview() {
     MaterialTheme {
-        MapScreen()
+        MapScreen(
+            events = listOf(
+                Event(
+                    id = "1",
+                    title = "Event 1",
+                    description = "Description 1",
+                    createdBy = "User 1",
+                    locationName = "Location 1",
+                    latitude = 40.7,
+                    longitude = -74.0
+                ),
+                Event(
+                    id = "2",
+                    title = "Event 2",
+                    description = "Description 2",
+                    createdBy = "User 2",
+                    locationName = "Location 2",
+                    latitude = 40.0,
+                    longitude = -74.0
+                )
+            ),
+            onEventClick = {}
+        )
     }
 }

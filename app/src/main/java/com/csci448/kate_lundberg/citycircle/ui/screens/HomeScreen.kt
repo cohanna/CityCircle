@@ -23,6 +23,7 @@ import com.csci448.kate_lundberg.citycircle.ui.EventCard
 fun HomeScreen(
     onCreateEventClick: () -> Unit,
     events: List<Event>,
+    onEventClick: (Event) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -71,7 +72,10 @@ fun HomeScreen(
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
             items(events) { event ->
-                EventCard(event = event)
+                EventCard(
+                    event = event,
+                    onClick = { onEventClick(event) }
+                )
             }
         }
     }
@@ -80,5 +84,5 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(onCreateEventClick = {}, events = EventRepo.events)
+    HomeScreen(onCreateEventClick = {}, events = EventRepo.events, onEventClick = {})
 }

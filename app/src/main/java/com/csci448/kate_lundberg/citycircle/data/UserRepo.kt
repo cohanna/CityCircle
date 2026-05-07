@@ -4,7 +4,6 @@ object UserRepo {
     val users: List<User> by lazy {
         listOf(
             User(
-                name = "Smurfette",
                 username = "smurfette",
                 bio = "the girl",
                 profilePictureUrl = null,
@@ -12,7 +11,6 @@ object UserRepo {
                 eventsHosted = listOf(EventRepo.events[0], EventRepo.events[1], EventRepo.events[2])
             ),
             User(
-                name = "Finn",
                 username = "adventure-time",
                 bio = "Finn Mertens (also known as Finn the Human) is the main protagonist in Adventure Time. He also appeared in the spin-off series Adventure Time: Distant Lands and returned in the spin-off series Adventure Time: Fionna & Cake. He was voiced by Jeremy Shada in most appearances. The character made his debut in the original pilot, where he is named \"Pen\" and voiced by Zack Shada, Jeremy's older brother. Jonathan Frakes voices Finn as an adult in some appearances and David Bradley voiced Finn in his old age in the Distant Lands special, \"Together Again\".\n" +
                         "\n" +
@@ -24,7 +22,6 @@ object UserRepo {
                 eventsHosted = listOf()
             ),
             User(
-                name = "Bob",
                 username = "spongebob_sqaure",
                 bio = "a square",
                 profilePictureUrl = null,

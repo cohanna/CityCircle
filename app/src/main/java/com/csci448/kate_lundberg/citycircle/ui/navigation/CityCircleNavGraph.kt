@@ -18,6 +18,7 @@ import com.csci448.kate_lundberg.citycircle.ui.screens.PreferencesScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.ProfileSetupScreen
 import com.csci448.kate_lundberg.citycircle.data.UserRepo
 import com.csci448.kate_lundberg.citycircle.ui.CityCircleBottomBar
+import com.csci448.kate_lundberg.citycircle.ui.UserAuthViewModel
 import com.csci448.kate_lundberg.citycircle.ui.screens.*
 import com.csci448.kate_lundberg.citycircle.viewmodel.CityCircleViewModel
 
@@ -30,10 +31,15 @@ fun CityCircleNavGraph() {
 
     val isKeyboardVisible = WindowInsets.ime.asPaddingValues().calculateBottomPadding() > 0.dp
 
-    val shouldShowBottomBar = when (currentRoute) {
-        "home", "search", "profile", "map", "create_event" -> !isKeyboardVisible
-        else -> false
+    val shouldShowBottomBar = when {
+        currentRoute == null -> false
+        currentRoute.startsWith("event_detail") -> true
+        isKeyboardVisible -> false
+        else -> currentRoute in listOf("home", "search", "profile", "map", "create_event")
     }
+
+    val userAuthViewModel: UserAuthViewModel = viewModel()
+    val currentUser by userAuthViewModel.currentUser.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -64,57 +70,78 @@ fun CityCircleNavGraph() {
             composable("home") {
                 val events by viewModel.events.collectAsState()
                 HomeScreen(
-                    events = events,
-                    onCreateEventClick = { navController.navigate("create_event") }
+                    events = events.filter { it.title.isNotBlank() },
+                    onCreateEventClick = { navController.navigate("create_event") },
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
                 )
             }
 
-            composable("map") { 
-                MapScreen()
+            composable("map") {
+                val events by viewModel.events.collectAsState()
+                MapScreen(
+                    events.filter { it.latitude != null && it.longitude != null },
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
+                )
             }
 
             composable("search") {
                 val events by viewModel.events.collectAsState()
-                EventSearchScreen(events = events)
+                EventSearchScreen(
+                    events = events.filter { it.title.isNotBlank() },
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")}
+                )
             }
 
             composable("profile") {
                 val users by viewModel.users.collectAsState()
-                val user = users.firstOrNull { it.username == "smurfette" }
+                val user = users.firstOrNull { it.username == userAuthViewModel.currentUsername }
                     ?: UserRepo.users[0] //just in case nothing else exists
-                ProfileScreen(user = user)
+                ProfileScreen(
+                    user = user,
+                    onEventClick = { event ->
+                        navController.navigate("event_detail/${event.id}")
+                    },
+                    onSignOut = {
+                        userAuthViewModel.signOut()
+                        navController.navigate("login")
+                    }
+                )
             }
 
             composable("login") {
                 LoginScreen(
+                    userAuthViewModel = userAuthViewModel,
+                    onSignInSuccess = {
+                        navController.navigate("home")
+                    },
                     onCreateAccountClick = {
                         navController.navigate("create_account")
                     },
-                    onSignInClick = {
-                        navController.navigate("home")
-                    }
                 )
             }
 
             composable("create_account") {
                 CreateAccountScreen(
-                    onNextClick = {
-                        navController.navigate("profile_setup")
-                    },
+                    userAuthViewModel = userAuthViewModel,
+                    cityCircleViewModel = viewModel,
                     onBackClick = {
                         navController.popBackStack()
+                    },
+                    onNextClick = {
+                        navController.navigate("profile_setup")
                     }
                 )
             }
 
             composable("profile_setup") {
+                val users by viewModel.users.collectAsState()
+                val user = users.firstOrNull { it.username == userAuthViewModel.currentUsername }
+                    ?: return@composable
                 ProfileSetupScreen(
-                    onNextClick = {
-                        navController.navigate("preferences")
-                    },
-                    onBackClick = {
-                        navController.popBackStack()
-                    }
+                    currentUser = user,
+                    cityCircleViewModel = viewModel,
+                    onNextClick = { navController.navigate("preferences") },
+                    onBackClick = { navController.popBackStack() }
                 )
             }
 
@@ -131,9 +158,40 @@ fun CityCircleNavGraph() {
 
             composable("create_event") {
                 CreateEventScreen(
+                    currentUsername = userAuthViewModel.currentUsername,
                     onCreateEvent = { event->
                         viewModel.addEvent(event)
                         navController.navigate("home")
+                    }
+                )
+            }
+
+            composable("event_detail/{eventId}") { backStackEntry ->
+                val eventId = backStackEntry.arguments?.getString("eventId") ?: return@composable
+                val events by viewModel.events.collectAsState()
+                val users by viewModel.users.collectAsState()
+                val event = events.firstOrNull { it.id == eventId } ?: return@composable
+                EventDetailScreen(
+                    event = event,
+                    currentUsername = userAuthViewModel.currentUsername,
+                    onBack = { navController.popBackStack() },
+                    onHostClick = { username -> navController.navigate("profile/$username") },
+                    onRSVPClick = { isAttending ->
+                        viewModel.rsvpEvent(eventId, userAuthViewModel.currentUsername, isAttending)
+                    }
+                )
+            }
+
+            composable("profile/{username}") { backStackEntry ->
+                val username = backStackEntry.arguments?.getString("username") ?: return@composable
+                val users by viewModel.users.collectAsState()
+                val user = users.firstOrNull { it.username == username } ?: return@composable
+                ProfileScreen(
+                    user = user,
+                    onEventClick = { event -> navController.navigate("event_detail/${event.id}")},
+                    onSignOut = {
+                        userAuthViewModel.signOut()
+                        navController.navigate("login")
                     }
                 )
             }

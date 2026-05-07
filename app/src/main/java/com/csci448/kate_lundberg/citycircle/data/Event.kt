@@ -7,5 +7,12 @@ data class Event(
     val id: String = "",
     val title: String = "",
     val description: String = "",
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+    val createdBy: String = "",
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val locationName: String = "",
+    val attendees: List<String> = emptyList(),
+    val date: String = "",
+    val cost: String = ""
 )

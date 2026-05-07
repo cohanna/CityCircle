@@ -14,8 +14,6 @@ import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
-
-    var location by remember { mutableStateOf("") }
     var distance by remember { mutableStateOf("") }
     var eventType by remember { mutableStateOf("") }
 
@@ -25,8 +23,8 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
     var selectedCost by remember { mutableStateOf("Select Cost") }
     var selectedSize by remember { mutableStateOf("Select Size") }
 
-    val costOptions = listOf("$", "$$", "$$$")
-    val sizeOptions = listOf("Small", "Medium", "Large")
+    val costOptions = listOf("$ (> $5)", "$$ (~ $50)", "$$$ (< $75)")
+    val sizeOptions = listOf("Small (> 15 attendees)", "Medium (~ 50 attendees)", "Large (> 75 attendees)")
 
     Column(
         modifier = Modifier
@@ -43,24 +41,15 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text("Location") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
             value = distance,
-            onValueChange = { distance = it },
-            label = { Text("Distance") },
+            onValueChange = { if ( it.toDoubleOrNull() != null ) distance = it },
+            label = { Text("Distance (in miles)") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(
+        OutlinedTextField(  //probs make a drop down
             value = eventType,
             onValueChange = { eventType = it },
             label = { Text("Type of Event") },
@@ -147,23 +136,25 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
             horizontalArrangement = Arrangement.Center
         ) {
             ElevatedButton (
-                onClick = onNextClick, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Blue,
-                    contentColor = Cream
-                )
-            ) {
-                Text("Next")
-            }
-            Spacer(modifier = Modifier.width(24.dp))
-            ElevatedButton (
-                onClick = onBackClick, elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                onClick = onBackClick,
+                elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Blue,
                     contentColor = Cream
                 )
             ) {
                 Text("Back")
+            }
+            Spacer(modifier = Modifier.width(24.dp))
+            ElevatedButton (
+                onClick = onNextClick,
+                elevation = ButtonDefaults.elevatedButtonElevation(8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Blue,
+                    contentColor = Cream
+                )
+            ) {
+                Text("Next")
             }
         }
 
