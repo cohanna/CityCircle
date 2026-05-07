@@ -24,6 +24,14 @@ fun EventSearchScreen(
 ) {
     var searchText by remember { mutableStateOf("") }
 
+    val filteredEvents = if (searchText.isBlank()) events
+    else events.filter {
+        it.title.contains(searchText, ignoreCase = true) ||
+        it.description.contains(searchText, ignoreCase = true) ||
+        it.locationName.contains(searchText, ignoreCase = true) ||
+        it.createdBy.contains(searchText, ignoreCase = true)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
@@ -51,7 +59,7 @@ fun EventSearchScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 16.dp)
         ) {
-            items(events) { event ->
+            items(filteredEvents) { event ->
                 EventCard(
                     event = event,
                     onClick = { onEventClick(event) }
