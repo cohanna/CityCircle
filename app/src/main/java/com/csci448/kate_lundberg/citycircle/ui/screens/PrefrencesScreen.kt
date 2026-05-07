@@ -14,8 +14,6 @@ import com.csci448.kate_lundberg.citycircle.ui.theme.Cream
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
-
-    var location by remember { mutableStateOf("") }
     var distance by remember { mutableStateOf("") }
     var eventType by remember { mutableStateOf("") }
 
@@ -25,8 +23,8 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
     var selectedCost by remember { mutableStateOf("Select Cost") }
     var selectedSize by remember { mutableStateOf("Select Size") }
 
-    val costOptions = listOf("$", "$$", "$$$")
-    val sizeOptions = listOf("Small", "Medium", "Large")
+    val costOptions = listOf("$ (> $5)", "$$ (~ $50)", "$$$ (< $75)")
+    val sizeOptions = listOf("Small (> 15 attendees)", "Medium (~ 50 attendees)", "Large (> 75 attendees)")
 
     Column(
         modifier = Modifier
@@ -43,24 +41,15 @@ fun PreferencesScreen(onNextClick: () -> Unit, onBackClick: () -> Unit) {
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
-            value = location,
-            onValueChange = { location = it },
-            label = { Text("Location") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
             value = distance,
-            onValueChange = { distance = it },
-            label = { Text("Distance") },
+            onValueChange = { if ( it.toDoubleOrNull() != null ) distance = it },
+            label = { Text("Distance (in miles)") },
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        OutlinedTextField(
+        OutlinedTextField(  //probs make a drop down
             value = eventType,
             onValueChange = { eventType = it },
             label = { Text("Type of Event") },

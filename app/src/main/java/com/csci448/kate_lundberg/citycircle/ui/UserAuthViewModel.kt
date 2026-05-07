@@ -69,10 +69,6 @@ class UserAuthViewModel : ViewModel() {
         _currentUsername.value = username
     }
 
-    fun setCurrentBio(){
-
-    }
-
     fun signOut() {
         auth.signOut()
         _currentUser.value = null

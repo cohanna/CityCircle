@@ -25,17 +25,18 @@ import com.csci448.kate_lundberg.citycircle.data.Event
 @Composable
 fun EventDetailScreen(
     event: Event,
+    currentUsername: String,
     onBack: () -> Unit,
-    onHostClick: (String) -> Unit
+    onHostClick: (String) -> Unit,
+    onRSVPClick: (Boolean) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        //back + title
-
         item{
+            //back + title
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { onBack() }) {
                     Icon(
@@ -156,6 +157,23 @@ fun EventDetailScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
 
+                //attendees
+                if (event.createdBy != currentUsername && currentUsername.isNotBlank()) {
+                    val isAttending = event.attendees.contains(currentUsername)
+                    Spacer(modifier = Modifier.height(12.dp))
+                    ElevatedButton(
+                        onClick = { onRSVPClick(!isAttending) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isAttending) MaterialTheme.colorScheme.error
+                            else MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(if (isAttending) "Cancel RSVP" else "RSVP to this event")
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
                 Text(
                     text = "Attendees (${event.attendees.size})",
                     style = MaterialTheme.typography.titleMedium,
@@ -195,7 +213,8 @@ fun EventDetailScreenPreview() {
             locationName = "Somewhere"
         ),
         onBack = {},
-        onHostClick = {}
-
+        onHostClick = {},
+        onRSVPClick = {},
+        currentUsername = "smurfette"
     )
 }

@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
-import com.csci448.kate_lundberg.citycircle.data.User
 import com.csci448.kate_lundberg.citycircle.ui.screens.LoginScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.CreateAccountScreen
 import com.csci448.kate_lundberg.citycircle.ui.screens.PreferencesScreen
@@ -172,12 +171,13 @@ fun CityCircleNavGraph() {
                 val events by viewModel.events.collectAsState()
                 val users by viewModel.users.collectAsState()
                 val event = events.firstOrNull { it.id == eventId } ?: return@composable
-                val host = users.firstOrNull { it.username == event.createdBy }
                 EventDetailScreen(
                     event = event,
+                    currentUsername = userAuthViewModel.currentUsername,
                     onBack = { navController.popBackStack() },
-                    onHostClick = { username ->
-                        navController.navigate("profile/$username")
+                    onHostClick = { username -> navController.navigate("profile/$username") },
+                    onRSVPClick = { isAttending ->
+                        viewModel.rsvpEvent(eventId, userAuthViewModel.currentUsername, isAttending)
                     }
                 )
             }
