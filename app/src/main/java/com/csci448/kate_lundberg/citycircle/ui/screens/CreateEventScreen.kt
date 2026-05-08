@@ -1,5 +1,7 @@
 package com.csci448.kate_lundberg.citycircle.ui.screens
 
+import android.location.Address
+import android.location.Geocoder
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -19,8 +21,13 @@ import com.csci448.kate_lundberg.citycircle.utils.FirebaseStorageUtil
 import com.csci448.kate_lundberg.citycircle.utils.LocationUtils
 import com.csci448.kate_lundberg.citycircle.R
 import com.csci448.kate_lundberg.citycircle.ui.ImageSelect
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.Locale
 import java.util.UUID
 
 @Composable
@@ -43,6 +50,34 @@ fun CreateEventScreen(
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var isUploading by remember { mutableStateOf(false) }
 
+    // Location autocomplete state
+    var locationSuggestions by remember { mutableStateOf<List<Address>>(emptyList()) }
+    var showSuggestions by remember { mutableStateOf(false) }
+    val geocoder = remember { Geocoder(context, Locale.getDefault()) }
+    var suggestionJob by remember { mutableStateOf<Job?>(null) }
+
+    // Fetch suggestions when locationName changes, with debounce
+    LaunchedEffect(locationName) {
+        suggestionJob?.cancel()
+        if (locationName.length < 3) {
+            locationSuggestions = emptyList()
+            showSuggestions = false
+            return@LaunchedEffect
+        }
+        suggestionJob = launch {
+            delay(300) // debounce
+            try {
+                val addresses = withContext(Dispatchers.IO) {
+                    geocoder.getFromLocationName(locationName, 5)
+                }
+                locationSuggestions = addresses ?: emptyList()
+                showSuggestions = locationSuggestions.isNotEmpty()
+            } catch (e: Exception) {
+                locationSuggestions = emptyList()
+                showSuggestions = false
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         val logoFile = File(context.cacheDir, "default_logo.jpg")
@@ -56,8 +91,7 @@ fun CreateEventScreen(
         imageUri = Uri.fromFile(logoFile)
     }
 
-
-    LazyColumn() {
+    LazyColumn {
         item {
             Column(
                 modifier = Modifier
@@ -94,7 +128,7 @@ fun CreateEventScreen(
                     supportingText = {
                         if (titleError) {
                             Text(
-                                text = "Event must have a title",   //make strings.xml value
+                                text = "Event must have a title",
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
@@ -116,17 +150,37 @@ fun CreateEventScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                //location
-                OutlinedTextField(
-                    value = locationName,
-                    onValueChange = {
-                        locationName = it
-                        locationError = false
-                    },
-                    label = { Text("Location:") },
-                    isError = locationError,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Location with autocomplete – using DropdownMenu to avoid nested scrollable crash
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = locationName,
+                        onValueChange = {
+                            locationName = it
+                            locationError = false
+                        },
+                        label = { Text("Location:") },
+                        isError = locationError,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DropdownMenu(
+                        expanded = showSuggestions && locationSuggestions.isNotEmpty(),
+                        onDismissRequest = { showSuggestions = false }
+                    ) {
+                        locationSuggestions.forEach { address ->
+                            DropdownMenuItem(
+                                text = { Text(address.getAddressLine(0) ?: address.featureName) },
+                                onClick = {
+                                    locationName = address.getAddressLine(0) ?: address.featureName
+                                    latitude = address.latitude
+                                    longitude = address.longitude
+                                    locationSuggestions = emptyList()
+                                    showSuggestions = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -155,14 +209,15 @@ fun CreateEventScreen(
                 //create event button
                 ElevatedButton(
                     onClick = {
-                        if (title.isBlank()) { //add if for description and location too lowk
+                        if (title.isBlank()) {
                             titleError = true
                             Toast.makeText(context, "Event must have a title", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
                             scope.launch {
                                 isUploading = true
-                                if (locationName.isNotBlank()) {
+                                // If the user typed manually without choosing a suggestion, geocode now
+                                if (latitude == null && longitude == null && locationName.isNotBlank()) {
                                     val coords = locationUtils.getLocationFromAddress(locationName)
                                     if (coords != null) {
                                         latitude = coords.first
